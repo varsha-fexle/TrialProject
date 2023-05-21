@@ -50,7 +50,7 @@ jobs:
       - name: Print package.xml
         run: cat package/package.xml
       
-      - name: deploy with QA
+      - name: Deploy with QA
         run: |
           sfdx force:source:deploy --manifest=package/package.xml \
               --postdestructivechanges destructiveChanges/destructiveChanges.xml \
