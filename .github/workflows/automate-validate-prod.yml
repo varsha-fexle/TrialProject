@@ -3,7 +3,7 @@ on:
   pull_request:
     types: [opened]
     branches:
-      - master
+      - QA
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -24,7 +24,7 @@ jobs:
           echo y | sfdx plugins:install sfdx-git-delta
           sfdx plugins
           
-      - name: 'Populate auth file with PROD_AUTH_URL secret'
+      - name: 'Populate auth file with QA_AUTH_URL secret'
         shell: bash
         run: |
             echo ${{ secrets.PROD_AUTH_URL}} > ./PROD_AUTH_URL.txt
@@ -49,8 +49,8 @@ jobs:
       - name: Print package.xml
         run: cat package/package.xml
       
-      - name: Validate with PROD
-         run: |
+      - name: Validate with Production
+        run: |
           sfdx force:source:deploy --checkonly \
               --manifest=package/package.xml \
               --postdestructivechanges destructiveChanges/destructiveChanges.xml \
