@@ -7,8 +7,6 @@
 * 
 * Revision Logs :   v_1.0 Created
 *
-*
-* changes 
 **/
 public class Constants {
 
