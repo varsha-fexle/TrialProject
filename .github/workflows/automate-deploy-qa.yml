@@ -35,7 +35,7 @@ jobs:
                 exit 1;
             fi
 
-      - name: Authenticate Dev Hub
+      - name: Authenticate with QA
         run: |
           sfdx force:auth:sfdxurl:store -f ./QA_AUTH_URL.txt -d -a devhub
 
