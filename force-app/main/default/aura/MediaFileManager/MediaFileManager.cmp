@@ -1,0 +1,136 @@
+<aura:component controller="MediaFileManagerController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,flexipage:availableForAllPageTypes" access="global" >
+    
+    <!-- attributes -->  
+    <aura:attribute name="isOpen" type="boolean" default="false"/>
+    <aura:attribute name="spinnerVisiblity" type="Boolean" default="true"/>
+    <aura:attribute name="modalSpinnerVisiblity" type="Boolean" default="false"/>
+    <aura:attribute name="objects" type="List" default="[{'label': 'None', 'value': 'None'}]"/>
+    <aura:attribute name="allObjects" type="List" default="[{'label': 'None', 'value': 'None'}]"/>
+    <aura:attribute name="fields" type="List"/>
+    
+    <aura:attribute name="objectAPIName" type="String" default=""/>
+    <aura:attribute name="selectedParentObj" type="String" default=""/>
+    <aura:attribute name="selectedTitle" type="String" default=""/>
+    <aura:attribute name="selectedURL" type="String" default=""/>
+    <aura:attribute name="selectedType" type="String" default=""/>
+    <aura:attribute name="selectedSize" type="String" default=""/>
+    <aura:attribute name="active" type="Boolean" default="true"/>
+
+    <aura:attribute name="showSobjects" type="Boolean" default="true"/> 
+    <aura:attribute name="searchedObjectValue" type="String" default=""/>
+    
+    <aura:attribute name="editRecordId" type="Id" default=""/>
+    <aura:attribute name="data" type="Object"/>
+    <aura:attribute name="columns" type="List"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <div class="slds-box slds-card ">
+        <aura:if isTrue="{!v.spinnerVisiblity}">
+            <div class="exampleHolder">
+                <lightning:spinner alternativeText="Loading" size="medium" />
+            </div>
+        </aura:if>
+        
+        <div class="slds-box slds-theme_shade">
+            <h2 class="slds-align_absolute-center slds-text-heading_small slds-text-title_bold">Manage Objects</h2>
+        </div>
+        <br/>
+        <lightning:button variant="brand" label="Configure Another Object" title="Configure Another Object" onclick="{! c.openModel }" />
+        
+        
+        <!--Use "slds-m-around_xx-large" class to add standard X-Large padding to the component--> 
+        <div class="slds-m-around_xx-large">
+            
+            <!--Use aura:if tag to display Model Box, on the bese of conditions. [isOpen boolean attribute] -->   
+            <aura:if isTrue="{!v.isOpen}">
+                
+                <!--###### MODAL BOX Start######--> 
+                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                    <div class="slds-modal slds-fade-in-open slds-modal__container">
+                        <aura:if isTrue="{!v.modalSpinnerVisiblity}">
+                            <div class="exampleHolder">
+                                <lightning:spinner alternativeText="Loading" size="medium" />
+                            </div>
+                        </aura:if>
+                        <!-- ###### MODAL BOX HEADER Start ######-->
+                        <header class="slds-modal__header slds-box slds-theme_shade">
+                            <lightning:buttonIcon iconName="utility:close"
+                                                  onclick="{! c.closeModel }"
+                                                  alternativeText="close"
+                                                  variant="bare"
+                                                  class="slds-modal__close"/>
+                            <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Object Setting</h2>
+                        </header>
+                        
+                        
+                        <!--###### MODAL BOX BODY Part Start######-->
+                        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                            <div class="slds-form-element">
+                                <label class="slds-form-element__label" for="text-input-id-1">Search City</label>
+                                <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_right">
+                                    <lightning:buttonIcon iconName="utility:down" class="slds-icon slds-input__icon slds-input__icon_right slds-icon-text-default" size="small" onclick="{!c.handleDropdownClick}"/>
+                                    <input type="text" placeholder="Select Object" class="slds-input" id="searchObject" aura:id="searchObject" onkeyup="{!c.searchSalesforceObject}" value="{!v.searchedObjectValue}"/>
+                                </div>
+                            </div>
+                            <aura:if isTrue="{!v.showSobjects == true}">
+                                <div class="slds-dropdown_length-with-icon-7 slds-p-around_none dropdownCls" role="listbox">
+                                    <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                        <aura:iteration items="{!v.objects}" var="sobjectData" indexVar="sObjectIndex">
+                                            <li role="presentation" class="slds-listbox__item listing">
+                                                <div id="option1"  role="option">
+                                                    <span class="slds-media__body">
+                                                        <span
+                                                            class="slds-listbox__option-text slds-listbox__option-text_entity spanPadding"
+                                                            title="{!sobjectData.value}"
+                                                            data-id="{!sobjectData.label}"
+                                                            id="{!'o'+sObjectIndex+1}"
+                                                            onclick="{! c.handleClick }">{!sobjectData.label}</span>
+                                                    </span>
+                                                </div>
+                                           </li>
+                                       </aura:iteration>
+                                    </ul>
+                                </div>
+                            </aura:if>
+                            <br/><br/>
+                            <aura:if isTrue="{!not(empty(v.fields))}">
+                                <div class="slds-clearfix modal-body">
+                                    <div class="slds-float_left">
+                                        <p style="padding-top:6px">Parent Field (<b class="slds-text-color_destructive">*</b>)</p><br/>
+                                        <p style="padding-top:12px">File Title</p><br/>
+                                        <p style="padding-top:13px">File URL (<b class="slds-text-color_destructive">*</b>)</p><br/>
+                                        <p style="padding-top:13px">File Type (<b class="slds-text-color_destructive">*</b>)</p><br/>
+                                        <p style="padding-top:15px">File Size</p><br/>
+                                    </div>
+                                    
+                                    <div class="slds-float_right">
+                                        <p><lightning:combobox name="parentField" label="Parent Field" value="{!v.selectedParentObj}" placeholder="Select Parent Field" options="{! v.fields }" onchange="{! c.handleParentObjChange }" required="true"/></p><br/>
+                                        <p><lightning:combobox name="fileTitle" label="File Title" value="{!v.selectedTitle}" placeholder="Select File Title" options="{! v.fields }" onchange="{! c.handleFileTitleChange }"/></p><br/>
+                                        <p><lightning:combobox name="fileURL" label="File URL" value="{!v.selectedURL}" placeholder="Select File URL" options="{! v.fields }" onchange="{! c.handleFileURLChange }" required="true"/></p><br/>
+                                        <p><lightning:combobox name="fileType" label="File Type" value="{!v.selectedType}" placeholder="Select File Type" options="{! v.fields }" onchange="{! c.handleFileTypeChange }" required="true"/></p><br/>
+                                        <p><lightning:combobox name="fileSize" label="File Size" value="{!v.selectedSize}" placeholder="Select File Size" options="{! v.fields }" onchange="{! c.handleFileSizeChange }"/></p><br/>
+                                    </div>
+                                </div>
+                                <p>Active <span style="margin-left: 6px;display: inline-block;"><lightning:input type="checkbox" label="" checked="{!v.active}"/></span></p>
+                            </aura:if>
+                            
+                        </div>
+                        <!--###### MODAL BOX FOOTER Part Start ######-->
+                        <footer class="slds-modal__footer">
+                            <lightning:button variant="neutral" label="Cancel" title="Cancel" onclick="{! c.closeModel }"/>
+                            <lightning:button variant="brand" label="Save" title="Save" onclick="{! c.save }"/>
+                        </footer>
+                    </div>
+                </section>
+                <div class="slds-backdrop slds-backdrop_open"></div>      
+            </aura:if>
+        </div>
+        
+        <aura:if isTrue="{!not(empty(v.data))}">
+            <div style="height: 500px">
+                <lightning:datatable keyField="Id" data="{! v.data }" columns="{! v.columns }" hideCheckboxColumn="true" onrowaction="{!c.handleEdit}"/>
+            </div>
+        </aura:if>
+    </div>
+</aura:component>

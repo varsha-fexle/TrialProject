@@ -1,0 +1,85 @@
+<aura:component access="global" >
+    
+    <aura:attribute name="mediaFiles" type="List"/>
+    <aura:attribute name="playId" type="String" default=""/>
+    <aura:attribute name="spinnerVisiblity" type="Boolean" default="false"/>
+    <aura:attribute name="isModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="imagesDetail" type="List"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    
+    <aura:if isTrue="{!v.spinnerVisiblity}">
+        <div class="exampleHolder">
+            <lightning:spinner alternativeText="Loading" size="medium" />
+        </div>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.isModalOpen}">
+        <section aura:id="exampleModal" role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_small" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1">
+            <div class="slds-modal slds-fade-in-open slds-modal__container">
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    
+                    <lightning:buttonIcon class="close_icon" iconName="utility:close" variant="bare" onclick="{! c.handleCancel }"/>
+                    
+                    <lightning:carousel disableAutoScroll="true">
+                        <aura:iteration items="{!v.imagesDetail}" var="file" indexVar="ind">
+                            <aura:if isTrue="{!file.isImage}">
+                                <lightning:carouselImage src = "{!file.fileURL}"/>
+                            </aura:if>
+                        </aura:iteration>
+                    </lightning:carousel>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+    
+    <div class="slds-card slds-grid slds-gutters slds-wrap slds-col slds-size_12-of-12 slds-p-left_medium">
+        <aura:iteration items="{!v.mediaFiles}" var="file" indexVar="ind" end="{! v.filesSize}">
+            <div class="slds-grid slds-gutters slds-col slds-size_4-of-12 slds-p-around_medium">
+                
+                <aura:if isTrue="{!!file.isAudio}">
+                    <div>
+                        <aura:if isTrue="{!file.isImage}">
+                            <img id="{!ind}" src="{!file.fileURL}" style="height: 231px;width: 400px;" onclick="{! c.handleImgClick }"/>
+                        </aura:if>
+                        <aura:if isTrue="{!file.isVideo}">
+                            <video controls="controls" id="{!ind}" src="{!file.fileURL}" onplay="{! c.handlePlay }" style="height: 232px;width: 410px;"/>
+                        </aura:if>
+                        
+                        <div class="slds-p-top_small">
+                            <aura:if isTrue="{!file.isImage}">
+                                <lightning:icon size="small" iconName="doctype:image" alternativeText="Image file" title="Image" />
+                            </aura:if>
+                            
+                            <aura:if isTrue="{!file.isVideo}">
+                                <lightning:icon size="small" iconName="doctype:mp4" alternativeText="Video file" title="Video" />
+                            </aura:if>
+                            
+                            <span><a id="{!file.fileId}" onclick="{!c.redirectToSobject}" style="text-decoration:none;padding-left: 5px;">{!file.fileName}</a>
+                                <br/><aura:if isTrue="{! file.createdDate != '' ? 'true':'false'}">{!file.createdDate}</aura:if><aura:if isTrue="{! file.fileSize != '' ? 'true':'false'}"> . {!file.fileSize} </aura:if><aura:if isTrue="{! file.fileType != '' ? 'true':'false'}">. {!file.fileType}</aura:if>
+                            
+                            </span>
+                            
+                        </div>
+                    </div>
+                </aura:if>
+                <!--for audio-->
+                <aura:if isTrue="{!file.isAudio}">
+                    <div>
+                        <div>
+                            <lightning:icon size="small" iconName="doctype:audio" alternativeText="Audio file" title="Audio" />
+                            <span><a id="{!file.fileId}" onclick="{!c.redirectToSobject}" style="text-decoration:none;padding-left: 5px;">{!file.fileName}</a>
+                                <br/><aura:if isTrue="{! file.createdDate != '' ? 'true':'false'}">{!file.createdDate}</aura:if><aura:if isTrue="{! file.fileSize != '' ? 'true':'false'}"> . {!file.fileSize} </aura:if><aura:if isTrue="{! file.fileType != '' ? 'true':'false'}">. {!file.fileType}</aura:if>
+                            
+                            </span>
+                        </div>
+                        
+                        <audio controls="controls" id="{!ind}" src="{!file.fileURL}" onplay="{! c.handlePlay }"/>
+                    </div>
+                </aura:if>
+            </div>
+        </aura:iteration>
+    </div>
+</aura:component>

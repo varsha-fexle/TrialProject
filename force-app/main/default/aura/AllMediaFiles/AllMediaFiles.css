@@ -1,0 +1,12 @@
+.THIS .slds-carousel__content {
+    display: none !important;
+}
+.THIS .close_icon{
+    margin-left: 780px;
+}
+.THIS audio{
+    width: 250px;
+}
+.THIS .slds-modal__content {
+    max-height : 150vh !important;
+}

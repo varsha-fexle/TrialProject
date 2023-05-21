@@ -1,0 +1,175 @@
+<aura:component controller="MediaFilesController" access="global" >
+    <!-- attributes -->
+    
+    <aura:attribute name="selectedSobject" type="String"/>
+    <aura:attribute name="selectedSobjectLabel" type="String"/>
+    <aura:attribute name="checkedMenu" type="String" default="All"/>
+    
+    <aura:attribute name="mediaFiles" type="List"/>
+    <aura:attribute name="mediaFilesLength" type="String"/>
+    <aura:attribute name="sObjectName" type="String"/>
+    <aura:attribute name="recordName" type="String"/>
+    <aura:attribute name="playId" type="String" default=""/>
+    <aura:attribute name="spinnerVisiblity" type="Boolean" default="true"/>
+    <aura:attribute name="isModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="isTileView" type="boolean" default="false"/>
+    <aura:attribute name="isListView" type="boolean" default="true"/>
+    <aura:attribute name="imagesDetail" type="List"/>
+    <aura:attribute name="recordId" type="Id"/>
+    
+    <!-- handler -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:attribute name="width" type="String" description=" width of parent region"/>
+    <lightning:flexipageRegionInfo width="{!v.width}"/>
+    
+    <p class="slds-hidden">
+        <aura:if isTrue="{! v.sObjectName == 'Case'}">
+    		<force:recordData aura:id="recordLoader" recordId="{!v.recordId}" fields="CaseNumber" targetFields="{!v.recordName}"/>
+        </aura:if>
+        <aura:if isTrue="{! v.sObjectName != 'Case'}">
+            <force:recordData aura:id="recordLoader" recordId="{!v.recordId}" fields="Name" targetFields="{!v.recordName}"/>
+        </aura:if>
+    </p>
+    
+    <aura:if isTrue="{!v.isModalOpen}">
+        <section aura:id="exampleModal" role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_small" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1">
+            <div class="slds-modal slds-fade-in-open slds-modal__container">
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    
+                    <lightning:buttonIcon class="close_icon" iconName="utility:close" variant="bare" onclick="{! c.handleCancel }"/>
+                    
+                    <lightning:carousel disableAutoScroll="true">
+                        <aura:iteration items="{!v.imagesDetail}" var="file" indexVar="ind">
+                            <aura:if isTrue="{!file.isImage}">
+                                <lightning:carouselImage src="{!file.fileURL}"/>
+                            </aura:if>
+                        </aura:iteration>
+                    </lightning:carousel>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+    <div class="slds-box slds-card" style="background: #efecec;">
+        <aura:if isTrue="{!v.spinnerVisiblity}">
+            <div class="exampleHolder">
+                <lightning:spinner alternativeText="Loading" size="medium" />
+            </div>
+        </aura:if>
+        <a onclick="{! c.navToHomePage}">{! v.sObjectName}</a> <b> > </b> <a onclick="{! c.navToRecordPage}">{! v.sObjectName == 'Case' ? v.recordName.CaseNumber:v.recordName.Name}</a><br/>
+        
+        <div class="slds-text-heading_small slds-media slds-no-space slds-grow  slds-p-top_medium" style="background: #efecec;">
+            <div class="slds-media__figure">
+                <span class="slds-avatar slds-avatar_medium">
+                    <img src="{!$Resource.media_player_icon}" alt="" />
+                </span>
+            </div>
+            <h1 class="slds-page-header__title slds-m-right_small slds-align-middle slds-truncate" style="padding-left: 8px;" ><b>Media Files ({! v.mediaFilesLength})</b><div class="slds-text-body_regular" style="font-weight: 500;padding-top: 4px;">({! v.selectedSobjectLabel})</div></h1>
+            
+            <div class="slds-media__body slds-media__figure">
+                <div class=" slds-float_right">
+                    <lightning:buttonMenu menuAlignment="right" alternativeText="Show menu" onselect="{! c.handleSelect }" >
+                        <lightning:menuItem aura:id="menuItems" value="All" label="All" checked="{! v.checkedMenu == 'All' ? true : false }" />
+                        <lightning:menuItem aura:id="menuItems" value="Image" label="Image" checked="{! v.checkedMenu == 'Image' ? true : false }" />
+                        <lightning:menuItem aura:id="menuItems" value="Video" label="Video" checked="{! v.checkedMenu == 'Video' ? true : false }" />
+                        <lightning:menuItem aura:id="menuItems" value="Audio" label="Audio" checked="{! v.checkedMenu == 'Audio' ? true : false }" />
+                    </lightning:buttonMenu>
+                    
+                    <lightning:buttonIconStateful iconName="utility:tile_card_list" selected="{! v.isTileView }" onclick="{! c.handleViewClick }" alternativeText="Tile View" />
+                    <lightning:buttonIconStateful iconName="utility:list" selected="{! v.isListView }" onclick="{! c.handleViewClick }" alternativeText="List View" />
+                </div>
+            </div>
+            
+        </div>
+        
+        <aura:if isTrue="{!not(empty(v.mediaFiles))}">
+            
+            <aura:if isTrue="{! v.isTileView}">
+                <br/>
+                <c:MediaFilesTileView mediaFiles="{! v.mediaFiles}"/>
+            </aura:if>
+            
+            <aura:if isTrue="{! v.isListView}">
+                
+                <div class="slds-p-top_medium">
+                    <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                        <thead>
+                            <tr class="slds-line-height_reset">
+                                <th class="" scope="col">
+                                    <div class="slds-truncate" title="S.No."></div>
+                                </th>
+                                <th class="" scope="col">
+                                    <div class="slds-truncate" title="Title">Title</div>
+                                </th>
+                                <th class="" scope="col">
+                                    <div class="slds-truncate" title="Type">Type</div>
+                                </th>
+                                <th class="" scope="col">
+                                    <div class="slds-truncate" title="Size">Size</div>
+                                </th>
+                                <th class="" scope="col">
+                                    <div class="slds-truncate" title="Created Date">Created Date</div>
+                                </th>
+                                <th class="" scope="col">
+                                    <div class="slds-truncate" title="Image/Video/Audio"></div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <aura:iteration items="{!v.mediaFiles}" var="file" indexVar="ind">
+                                <tr class="slds-hint-parent">
+                                    <th scope="row">{!ind +1}</th>
+                                    <th scope="row">
+                                        <div class="slds-truncate" title="Cloudhub + Anypoint Connectors">
+                                            <aura:if isTrue="{!file.isImage}">
+                                                <lightning:icon size="small" iconName="doctype:image" alternativeText="Image file" title="Image" />
+                                            </aura:if>
+                                            
+                                            <aura:if isTrue="{!file.isVideo}">
+                                                <lightning:icon size="small" iconName="doctype:mp4" alternativeText="Video file" title="Video" />
+                                            </aura:if>
+                                            
+                                            <aura:if isTrue="{!file.isAudio}">
+                                                <lightning:icon size="small" iconName="doctype:audio" alternativeText="Audio file" title="Audio" />
+                                            </aura:if>
+                                            
+                                            <a id="{!file.fileId}" onclick="{!c.redirectToSobject}" style="text-decoration:none;padding-left: 5px;">{!file.fileName}</a>
+                                        </div>
+                                    </th>
+                                    <td>
+                                        <div class="slds-truncate" title="Type">{!file.fileType}</div>
+                                    </td>
+                                    <td>
+                                        <div class="slds-truncate" title="Size">{!file.fileSize}</div>
+                                    </td>
+                                    <td>
+                                        <div class="slds-truncate" title="Created Date">{!file.createdDate}</div>
+                                    </td>
+                                    <td>
+                                        <div class="slds-truncate" title="Image/Video/Audio">
+                                            <aura:if isTrue="{!file.isImage}">
+                                                <img id="{!ind}" src="{!file.fileURL}" width="200" height="50" onclick="{! c.handleImgClick }"/>
+                                            </aura:if>
+                                            <aura:if isTrue="{!file.isAudio}">
+                                                <audio controls="controls" id="{!ind}" src="{!file.fileURL}" onplay="{! c.handlePlay }"/>
+                                            </aura:if>
+                                            <aura:if isTrue="{!file.isVideo}">
+                                                
+                                                <video controls="controls" id="{!ind}" src="{!file.fileURL}" onplay="{! c.handlePlay }" style="width: 200px;height: 129px;"/>
+                                                
+                                            </aura:if>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </aura:iteration>
+                        </tbody>
+                    </table>
+                    
+                </div>
+            </aura:if>
+            
+        </aura:if>
+    </div>
+    
+</aura:component>

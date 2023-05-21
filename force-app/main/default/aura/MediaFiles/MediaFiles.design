@@ -1,0 +1,3 @@
+<design:component label="Media Files">
+    <design:attribute name="selectedSobject" label="Select a object" datasource="apex://DesignResourcePickList" default="Notes and Attachments" required="true"/>
+</design:component>

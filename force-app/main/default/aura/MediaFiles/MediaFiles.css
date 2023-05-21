@@ -1,0 +1,27 @@
+.THIS .custombutton-margin {
+    margin-left: 9px;
+}
+.THIS .fileName_width {
+    width : 30%;
+}
+.THIS .slds-card__header {
+    padding: 6px 0px 6px 10px;
+    background-color: #f3f0f0;
+}
+.THIS .slds-border_top {
+    margin-top: 2px;
+}
+.THIS .slds-carousel__content {
+    display: none !important;
+}
+.THIS .close_icon{
+    margin-left: 780px;
+}
+
+.THIS audio{
+    width: 220px;
+}
+
+.THIS .slds-modal__content {
+    max-height : 140vh !important;
+}

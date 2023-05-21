@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Content_URL_Format</fullName>
+        <categories>MFM Package</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Content_URL_Format</shortDescription>
+        <value>.file.force.com</value>
+    </labels>
+    <labels>
+        <fullName>Success</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Success</shortDescription>
+        <value>SUCCESS</value>
+    </labels>
+</CustomLabels>
