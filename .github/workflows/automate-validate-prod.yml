@@ -50,9 +50,9 @@ jobs:
         run: cat package/package.xml
       
       - name: Validate with PROD
-        run: |
+         run: |
           sfdx force:source:deploy --checkonly \
               --manifest=package/package.xml \
               --postdestructivechanges destructiveChanges/destructiveChanges.xml \
               --testlevel=RunLocalTests \
-              --targetOrg devhub \
+              -u devhub \
