@@ -55,4 +55,4 @@ jobs:
               --manifest=package/package.xml \
               --postdestructivechanges destructiveChanges/destructiveChanges.xml \
               --testlevel=RunLocalTests \
-              -u devhub \
+              --targetOrg devhub \
