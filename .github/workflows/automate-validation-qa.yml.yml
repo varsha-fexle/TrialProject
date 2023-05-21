@@ -1,0 +1,58 @@
+name: Validate Changes
+on:
+  pull_request:
+    types: [opened]
+    branches:
+      - QA
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+         fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: "16.x"
+            
+      - name: Install Dependencies
+        run: |
+          npm install sfdx-cli --global
+          echo y | sfdx plugins:install sfdx-git-delta
+          sfdx plugins
+          
+      - name: 'Populate auth file with QA_AUTH_URL secret'
+        shell: bash
+        run: |
+            echo ${{ secrets.QA_AUTH_URL}} > ./QA_AUTH_URL.txt
+            secretFileSize=$(wc -c "./QA_AUTH_URL.txt" | awk '{print $1}')
+            if [ $secretFileSize == 1 ]; then
+                echo "Missing QA_AUTH_URL secret. Is this workflow running on a fork?";
+                exit 1;
+            fi
+      
+      - name: Authenticate with QA 
+        run: |
+          sfdx force:auth:sfdxurl:store -f ./QA_AUTH_URL.txt -d -a devhub
+            
+      - name: Generate diff metadata
+        run: |
+             sfdx sgd:source:delta \
+             --from ${{github.event.pull_request.base.sha}} \
+             --to ${{github.event.pull_request.head.sha}} \
+             --output . \
+             -i .forceignore
+       
+      - name: Print package.xml
+        run: cat package/package.xml
+      
+      - name: Validate with QA
+        run: |
+          sfdx force:source:deploy --checkonly \
+              --manifest=package/package.xml \
+              --postdestructivechanges destructiveChanges/destructiveChanges.xml \
+              --testlevel=RunLocalTests \
+              -u devhub \
