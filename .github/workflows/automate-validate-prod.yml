@@ -3,7 +3,7 @@ on:
   pull_request:
     types: [opened]
     branches:
-      - QA
+      - master
 jobs:
   validate:
     runs-on: ubuntu-latest
