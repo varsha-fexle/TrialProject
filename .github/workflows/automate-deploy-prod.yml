@@ -28,7 +28,7 @@ jobs:
       - name: 'Populate auth file with PROD_AUTH_URL secret'
         shell: bash
         run: |
-            echo ${{ secrets.PROD_SFDX_URL}} > ./PROD_AUTH_URL.txt
+            echo ${{ secrets.PROD_AUTH_URL}} > ./PROD_AUTH_URL.txt
             secretFileSize=$(wc -c "./PROD_AUTH_URL.txt" | awk '{print $1}')
             if [ $secretFileSize == 1 ]; then
                 echo "Missing PROD_AUTH_URL secret. Is this workflow running on a fork?";
