@@ -50,7 +50,7 @@ jobs:
       - name: Print package.xml
         run: cat package/package.xml
       
-      - name: Deploy in Prod
+      - name: Deploy in Production
         run: |
           sfdx force:source:deploy --manifest=package/package.xml \
               --postdestructivechanges destructiveChanges/destructiveChanges.xml \
