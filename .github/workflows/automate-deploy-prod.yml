@@ -35,7 +35,7 @@ jobs:
                 exit 1;
             fi
 
-      - name: Authenticate Dev Hub
+      - name: Authenticate with Production
         run: |
           sfdx force:auth:sfdxurl:store -f ./PROD_AUTH_URL.txt -d -a devhub
 
@@ -50,7 +50,7 @@ jobs:
       - name: Print package.xml
         run: cat package/package.xml
       
-      - name: Deploy in Prod
+      - name: Deploy in Production
         run: |
           sfdx force:source:deploy --manifest=package/package.xml \
               --postdestructivechanges destructiveChanges/destructiveChanges.xml \
